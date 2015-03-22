@@ -27,7 +27,6 @@ var TimeToSet      = new Date(options.timeToSet.year,
                                options.timeToSet.second,
                                options.timeToSet.millisecond);
 
-
 FileSystem.exists(options.watchedDir, function(exists) {
     
     if(!exists) {
@@ -46,7 +45,7 @@ FileSystem.exists(options.watchedDir, function(exists) {
 
             FileSystem.stat(file, function(err, stats) {
 
-                // Prevent infite while by checking if the date has been already touched
+                // Prevent infinite while by checking if the date has already been touched
                 if(+stats.mtime === +TimeToSet) {
                     return false;
                 }
@@ -60,6 +59,20 @@ FileSystem.exists(options.watchedDir, function(exists) {
                   , atime: TimeToSet // Added time
                   , mtime: TimeToSet // Modified time
                   , nocreate: false
+                });
+                
+                // Important: Touch the Data directory (modified, added, created)
+                FileSystem.stat(options.watchedDir, function(err, stats) {
+                    if(+stats.mtime === +TimeToSet) {
+                        return false;
+                    }
+                    Touch(options.watchedDir, {
+                        force: true
+                      , time: TimeToSet // Creation time
+                      , atime: TimeToSet // Added time
+                      , mtime: TimeToSet // Modified time
+                      , nocreate: false
+                    });
                 });
             });
         }
