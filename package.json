@@ -1,0 +1,32 @@
+{
+  "name": "Espionage-Plausible-Deniability-Improved",
+  "version": "1.0.0",
+  "description": "Improve Plausible Deniability in Espionage 3 by setting the same timestamp for all .sparsebundle",
+  "main": "Service.js",
+  "dependencies": {
+    "chokidar": "^1.0.0-rc4",
+    "pwuid": "^1.0.2"
+  },
+  "devDependencies": {
+    "touch": "0.0.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pwnsdx/Espionage-Plausible-Deniability-Improved"
+  },
+  "keywords": [
+    "espionage",
+    "plausible",
+    "deniability",
+    "improvement"
+  ],
+  "author": "Sabri Haddouche",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pwnsdx/Espionage-Plausible-Deniability-Improved/issues"
+  },
+  "homepage": "https://github.com/pwnsdx/Espionage-Plausible-Deniability-Improved"
+}
