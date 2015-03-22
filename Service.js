@@ -10,73 +10,94 @@ var Touch           = require('touch');
 var options         = {
     timeToSet: {
         year: 1984
-      , month: 01
-      , day: 24
-      , hour: 03
-      , minute: 00
-      , second: 00
-      , millisecond: 00
+        , month: 01
+        , day: 24
+        , hour: 03
+        , minute: 00
+        , second: 00
+        , millisecond: 00
     }
-  , watchedDir: (User().dir + '/Library/Application\ Support/com.taoeffect.Espionage3/Data/')
+    , watchedDir: (User().dir + '/Library/Application\ Support/com.taoeffect.Espionage3/Data/')
 };
 var TimeToSet      = new Date(options.timeToSet.year,
-                               options.timeToSet.month,
-                               options.timeToSet.day,
-                               options.timeToSet.hour,
-                               options.timeToSet.minute,
-                               options.timeToSet.second,
-                               options.timeToSet.millisecond);
+                              options.timeToSet.month,
+                              options.timeToSet.day,
+                              options.timeToSet.hour,
+                              options.timeToSet.minute,
+                              options.timeToSet.second,
+                              options.timeToSet.millisecond);
+options.touch = {
+    force: true
+    , time: TimeToSet // Creation time
+    , atime: TimeToSet // Added time
+    , mtime: TimeToSet // Modified time
+    , nocreate: false
+};
 
 FileSystem.exists(options.watchedDir, function(exists) {
-    
+
     if(!exists) {
         console.log('Please install Espionage 3 first.');
         return false;
     }
-        
+
     FileWatcher.watch(options.watchedDir, {
-        ignored: function(path) {
+        /*ignored: function(path) {
           return RegExp(options.watchedDir + '.+/').test(path);
-        }
-    }).on('addDir', function(file) {
+        }*/
+    }).on('all', function(event, file) {
 
-        // Checking if this is an .sparsebundle file
-        if(endsWith(file, '.sparsebundle')) {
+        switch(event) {
 
-            FileSystem.stat(file, function(err, stats) {
+            case 'addDir': // Event: When a .sparsebundle is opened/closed
 
-                // Prevent infinite while by checking if the date has already been touched
-                if(+stats.mtime === +TimeToSet) {
-                    return false;
+                // Checking if this is a .sparsebundle file
+                if(endsWith(file, '.sparsebundle')) {
+
+                    FileSystem.stat(file, function(err, stats) {
+
+                        // Prevent infinite while by checking if the date has already been touched
+                        if(+stats.mtime === +TimeToSet) {
+                            return false;
+                        }
+                        //console.log('<' + Path.parse(file).name + '> ' + 'Hiding modifications to the container...');
+                        console.log('[CONTAINER] Hiding modifications...');
+
+                        // Touch the file
+                        Touch(file, options.touch);
+                    });
                 }
-                //console.log('<' + Path.parse(file).name + '> ' + 'Hiding modifications to the container...');
-                console.log('Hiding modifications of a container...');
 
-                // Touch the file
-                Touch(file, {
-                    force: true
-                  , time: TimeToSet // Creation time
-                  , atime: TimeToSet // Added time
-                  , mtime: TimeToSet // Modified time
-                  , nocreate: false
-                });
-                
-                // Important: Touch the Data directory (modified, added, created)
+                // Important: Touch the Data directory (modified, added, created params)
                 FileSystem.stat(options.watchedDir, function(err, stats) {
                     if(+stats.mtime === +TimeToSet) {
                         return false;
                     }
-                    Touch(options.watchedDir, {
-                        force: true
-                      , time: TimeToSet // Creation time
-                      , atime: TimeToSet // Added time
-                      , mtime: TimeToSet // Modified time
-                      , nocreate: false
-                    });
+                    Touch(options.watchedDir, options.touch);
                 });
-            });
+                break;
+
+            case 'add': case 'change': // Event: When a file is modified/added
+
+                // Checking if this is come from .sparsebundle file
+                if(file.indexOf('.sparsebundle') > -1 && !endsWith(file, '.sparsebundle')) {
+
+                    FileSystem.stat(file, function(err, stats) {
+
+                        // Prevent infinite while by checking if the date has already been touched
+                        if(+stats.mtime === +TimeToSet) {
+                            return false;
+                        }
+                        console.log('[FILE] <' + Path.parse(file).name + '> ' + 'Hiding modifications...');
+                        //console.log('Hiding modifications of a container...');
+
+                        // Touch the file
+                        Touch(file, options.touch);
+                    });
+                }
+                break;
         }
     });
-    
-    console.log('Improved Plausible Deniability is now running.');
+
+    console.log('Improved Plausible Deniability for Espionage 3 is now running.');
 });
