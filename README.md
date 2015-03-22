@@ -21,7 +21,7 @@ cd ./Espionage-Plausible-Deniability-Improved
 npm install
 # Run like this
 node Service.js
-# Let the process running in background while using Espionage
+# Let the process running in background while you are using Espionage
 ```
 
 What is that for?
