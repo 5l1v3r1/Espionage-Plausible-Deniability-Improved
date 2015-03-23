@@ -21,6 +21,9 @@ cd ./Espionage-Plausible-Deniability-Improved
 npm install
 # Run like this
 node Service.js
+# If you would like to see what's happening, you can active the debug mode
+# It will show what modifications are done to your containers
+node Service.js --debug=true
 # Let the process running in background while you are using Espionage
 ```
 

@@ -17,6 +17,7 @@ var options         = {
         , second: 00
         , millisecond: 00
     }
+    , debug: false
     , watchedDir: (User().dir + '/Library/Application\ Support/com.taoeffect.Espionage3/Data/')
 };
 var TimeToSet      = new Date(options.timeToSet.year,
@@ -40,6 +41,16 @@ FileSystem.exists(options.watchedDir, function(exists) {
         console.log('Please install Espionage 3 first.');
         return false;
     }
+    
+    // Check if debug mode is active
+    process.argv.forEach(function (val, index, array) {
+      if(index === 2) {
+          if(val === '--debug=true') {
+              options.debug = true;
+              return false;
+          }
+      }
+    });
 
     FileWatcher.watch(options.watchedDir, {
         /*ignored: function(path) {
@@ -60,8 +71,10 @@ FileSystem.exists(options.watchedDir, function(exists) {
                         if(+stats.mtime === +TimeToSet) {
                             return false;
                         }
-                        //console.log('<' + Path.parse(file).name + '> ' + 'Hiding modifications to the container...');
-                        console.log('[CONTAINER] Hiding modifications...');
+                        
+                        if(options.debug) {
+                            console.log('[CONTAINER] <' + Path.parse(file).name + '> ' + 'Hiding modifications...');
+                        }
 
                         // Touch the file
                         Touch(file, options.touch);
@@ -88,9 +101,11 @@ FileSystem.exists(options.watchedDir, function(exists) {
                         if(+stats.mtime === +TimeToSet) {
                             return false;
                         }
-                        console.log('[FILE] <' + Path.parse(file).name + '> ' + 'Hiding modifications...');
-                        //console.log('Hiding modifications of a container...');
-
+                        
+                        if(options.debug) {
+                            console.log('[FILE] <' + Path.parse(file).name + '> ' + 'Hiding modifications...');
+                        }
+                        
                         // Touch the file
                         Touch(file, options.touch);
                     });
